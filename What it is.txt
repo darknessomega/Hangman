@@ -1,0 +1,4 @@
+This project is a modified version of the game Hangman. At the beginning of the game, the user is asked what word he would like to be included in the definition of the word he will be guessing. Of the words that have the user word in the definition, a random word would be selected from an English dictionary database. There would be an input box, where the player would input letters, and a button to submit a letter. A list of the letters already tried would be displayed. When the player makes his first mistake, the stand where the body will hang if you lose the game would appear, as would the head of the stick-figure man. With every subsequent mistake, an additional body part would appear. The game would end when the player completed the word (victory), or the body was completed (loss).
+       
+
+
