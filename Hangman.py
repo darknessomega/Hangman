@@ -1,17 +1,22 @@
 import sqlite3 as sql
 import random
 from Tkinter import *
+print sql.sqlite_version
+ 
 
 conn = sql.connect('dictionary.db')
 conn.text_factory = str
 cur = conn.cursor()
 
-print cur.execute('SELECT word, pos, def FROM eng_dict WHERE word LIKE "%Abaist"')
+cur.execute('SELECT word, pos, def FROM eng_dict WHERE word LIKE "%Abaist"')
                   
 all_rows = cur.fetchall()
-print('1):', all_rows)
+print all_rows
 
-conn.close()
+cur.execute('SELECT word, def FROM eng_dict WHERE word LIKE "%Abaist"')
+print cur.fetchall()
+
+    
 
 
 root = Tk()
@@ -31,15 +36,29 @@ bottom_frame.pack(side = BOTTOM, fill = BOTH, expand = YES)
 bottom_frame_label = Label(bottom_frame, anchor = S, text = 'Entry')
 bottom_frame_label.pack()
 
-word_contained = Entry(bottom_frame)
-word_contained.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
+word_contained_entry = Entry(bottom_frame)
+word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 
-def retrieve_input():
-    user_word = word_contained.get("1.0", 'end-1c')
+def retrieve_word_contained():
+    return_word = word_contained_entry.get()
+    return return_word
 
-word_contained_button = Button(bottom_frame, text = 'Submit', command = retrieve_input)
+user_word = retrieve_word_contained
+
+def search_dict():
+    test_word = "   Flower"
+    cur.execute('SELECT word, def FROM eng_dict WHERE word LIKE ?', (test_word,))
+    return cur.fetchall()
+
+
+def word_contained_button_cmd():
+    retrieve_word_contained
+    search_dict
+
+word_contained_button = Button(bottom_frame, text = 'Submit', command = word_contained_button_cmd)
 word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
-                                                     
+
+
 
 ##Entry Frame END##
 
@@ -81,6 +100,7 @@ letters_frame_label = Label(letters_frame, text = 'Letters Tried')
 letters_frame_label.pack()
 
 ##Letters Frame END#
+
 
 mainloop()
 
