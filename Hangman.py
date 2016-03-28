@@ -1,7 +1,8 @@
 import sqlite3 as sql
 import random
+import string
 from Tkinter import *
-print sql.sqlite_version
+
  
 
 conn = sql.connect('dictionary.db')
@@ -43,21 +44,27 @@ def retrieve_word_contained():
     return_word = word_contained_entry.get()
     return return_word
 
-user_word = retrieve_word_contained
-
 def search_dict():
-    test_word = "   Flower"
-    cur.execute('SELECT word, def FROM eng_dict WHERE word LIKE ?', (test_word,))
+    test_word = retrieve_word_contained()
+    cur.execute('SELECT word FROM eng_dict WHERE def LIKE ?', ('%' + test_word + '%',))
     return cur.fetchall()
 
+def select_word():
+    search_results = search_dict()
+    print search_results
+    game_word_tuple = random.choice(search_results)
+    game_word = string.join(game_word_tuple)
+    return game_word
 
 def word_contained_button_cmd():
-    retrieve_word_contained
-    search_dict
+    print select_word()
+    
+    word_contained_button.pack_forget()
+    letter_guess_button = Button(bottom_frame, text = 'Submit letter guess')
+    letter_guess_button.pack(side = LEFT, anchor = S, pady = 1)
 
-word_contained_button = Button(bottom_frame, text = 'Submit', command = word_contained_button_cmd)
+word_contained_button = Button(bottom_frame, text = 'Submit search word', command = word_contained_button_cmd)
 word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
-
 
 
 ##Entry Frame END##
