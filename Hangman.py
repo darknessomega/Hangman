@@ -9,17 +9,6 @@ conn = sql.connect('dictionary.db')
 conn.text_factory = str
 cur = conn.cursor()
 
-cur.execute('SELECT word, pos, def FROM eng_dict WHERE word LIKE "%Abaist"')
-                  
-all_rows = cur.fetchall()
-print all_rows
-
-cur.execute('SELECT word, def FROM eng_dict WHERE word LIKE "%Abaist"')
-print cur.fetchall()
-
-    
-
-
 root = Tk()
 root.title("Modified Hangman")
 
@@ -51,14 +40,27 @@ def search_dict():
 
 def select_word():
     search_results = search_dict()
-    print search_results
     game_word_tuple = random.choice(search_results)
     game_word = string.join(game_word_tuple)
     return game_word
 
-def word_contained_button_cmd():
-    print select_word()
+def get_game_word():
+    word = select_word().lower()[3:]
+    return word
+
+def letter_spaces():
+    word = get_game_word()
+    spaces = ''
+    for i in range(len(word)):
+        spaces += '_ '
+    spaces = spaces[:-1]
+    word_frame_game_word = Label(word_frame, font = 40, text = spaces, bg = 'white')
+    word_frame_game_word.pack(padx = 4, pady = 4)
     
+def word_contained_button_cmd():
+    game_word = get_game_word()
+    letter_spaces()
+    print game_word
     word_contained_button.pack_forget()
     letter_guess_button = Button(bottom_frame, text = 'Submit letter guess')
     letter_guess_button.pack(side = LEFT, anchor = S, pady = 1)
@@ -76,8 +78,7 @@ word_frame.pack(side = LEFT, fill = BOTH, expand = YES)
 word_frame_label = Label(word_frame, text = 'Word')
 word_frame_label.pack()
 
-mystery_word = Text (word_frame, height = 4)
-mystery_word.pack()
+
 
 ##Word Frame END##
 
