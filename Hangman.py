@@ -47,66 +47,62 @@ def get_game_word(game_word):
 
 
 correct_letter_indices = []
-wrong_letters = []
-labelText = StringVar()
-ils_flag = True
-def initial_letter_space(labelText, ils_flag):
-    letter_spaces = []
+incorrect_letter_spaces = []
+correct_letter_spaces = []
+correctLetters = StringVar()
+incorrectLetters = StringVar()
+
+def initial_correct_letter_space(correctLetters, letter_spaces):
     for i in range(len(game_word[0])):
         letter_spaces += '_'
     string_letter_spaces = string.join(letter_spaces)
-    labelText.set(string_letter_spaces)
-    if (ils_flag == True):
-        word_frame_game_word = Label(word_frame, font = 40, textvariable = labelText , bg = 'white')
-        word_frame_game_word.pack(padx = 4, pady = 4)
-    ils_flag = False
+    correctLetters.set(string_letter_spaces)
+    word_frame_game_word = Label(word_frame, font = 40, textvariable = correctLetters , bg = 'white')
+    word_frame_game_word.pack(padx = 4, pady = 4)
     return letter_spaces
 
- 
+def initial_incorrect_letter_space(incorrectLetters):
+    incorrectLetters.set('')
+    letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrectLetters, bg = 'white')
+    letters_frame_incorrect_tries.pack()
 
-    
-def letter_guess():
-    return_letter = letter_guess_entry.get()
-    return return_letter
-
-def match_check(indices, letters):
-    match = False
-    guess = letter_guess()
+match = ['False']
+def match_check(match):
+    match[0] = 'False'
+    guess = letter_guess_entry.get()
     for i in range(len(game_word[0])):
         if(guess == game_word[0][i]):
-            match = True
-            indices.append(i)
-            if(i == len(game_word[0])):
-                return indices
-    if(match == False):
-        print guess
+            match[0] = 'True'
+    return match
+    
+def match_action(indices, letters, match):
+    guess = letter_guess_entry.get()
+    if (match[0] == 'True'):
+        for i in range(len(game_word[0])):
+            if(guess == game_word[0][i]):
+                indices.append(i)
+        return indices
+    if(match[0] == 'False'):
         letters.append(guess)
-        print string.join(letters)
         return letters
 
-letter_spaces = []
-els_flag = True
-
-def edit_letter_space(indices, letter_spaces, els_flag):
-    if (els_flag == True):
-        letter_spaces = initial_letter_space(labelText, ils_flag)
-        els_flag = False
-    for i in indices:
-        letter_spaces[i] = game_word[0][i]
-    print letter_spaces
-    labelText.set(string.join(letter_spaces))
-    return letter_spaces
-
-
+def edit_letter_space(letter_spaces, indices = None):
+    if (indices != None):
+        for i in indices:
+            letter_spaces[i] = game_word[0][i]
+            correctLetters.set(string.join(letter_spaces))
+        return letter_spaces
+    if (indices == None):
+            incorrectLetters.set(string.join(letter_spaces))
+    
 
 def letter_guess_button_cmd():
-    letter_guess()
-    match_check(correct_letter_indices, wrong_letters)
-    letters_frame_tries = Label(letters_frame, font = 40, text = string.join(wrong_letters), bg = 'white')
-    letters_frame_tries.pack(padx = 4, pady = 4)
-    if(len(wrong_letters) > 1):
-        letters_frame_tries.pack_forget()
-    edit_letter_space(correct_letter_indices, letter_spaces, els_flag)
+    match_check(match)
+    match_action(correct_letter_indices, incorrect_letter_spaces, match)
+    if (match[0] == 'True'):
+        edit_letter_space(correct_letter_spaces, correct_letter_indices)
+    if (match[0] == 'False'):
+        edit_letter_space(incorrect_letter_spaces)
     
 
         
@@ -116,7 +112,8 @@ letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command
 
 def word_contained_button_cmd():
     get_game_word(game_word)
-    initial_letter_space(labelText, ils_flag)
+    initial_correct_letter_space(correctLetters, correct_letter_spaces)
+    initial_incorrect_letter_space(incorrectLetters)
     print game_word[0]
     word_contained_entry.pack_forget()  
     letter_guess_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
