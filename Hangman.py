@@ -51,6 +51,8 @@ incorrect_letter_spaces = []
 correct_letter_spaces = []
 correctLetters = StringVar()
 incorrectLetters = StringVar()
+incorrectLettersCount = [0]
+
 
 def initial_correct_letter_space(correctLetters, letter_spaces):
     for i in range(len(game_word[0])):
@@ -62,7 +64,7 @@ def initial_correct_letter_space(correctLetters, letter_spaces):
     return letter_spaces
 
 def initial_incorrect_letter_space(incorrectLetters):
-    incorrectLetters.set('')
+    incorrectLetters.set('Incorrect Tries: ' + str(incorrectLettersCount[0]) + '\n' + string.join(incorrect_letter_spaces))
     letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrectLetters, bg = 'white')
     letters_frame_incorrect_tries.pack()
 
@@ -86,24 +88,27 @@ def match_action(indices, letters, match):
         letters.append(guess)
         return letters
 
-def edit_letter_space(letter_spaces, indices = None):
+def edit_letter_space(letter_spaces, count, indices = None):
     if (indices != None):
         for i in indices:
             letter_spaces[i] = game_word[0][i]
             correctLetters.set(string.join(letter_spaces))
         return letter_spaces
     if (indices == None):
-            incorrectLetters.set(string.join(letter_spaces))
+        count += 1
+        print count
+        incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(letter_spaces))
+        return count
+            
     
-
 def letter_guess_button_cmd():
     match_check(match)
     match_action(correct_letter_indices, incorrect_letter_spaces, match)
     if (match[0] == 'True'):
-        edit_letter_space(correct_letter_spaces, correct_letter_indices)
+        edit_letter_space(correct_letter_spaces, incorrectLettersCount[0], correct_letter_indices)
     if (match[0] == 'False'):
-        edit_letter_space(incorrect_letter_spaces)
-    
+        incorrectLettersCount[0] = edit_letter_space(incorrect_letter_spaces, incorrectLettersCount[0])
+         
 
         
 
