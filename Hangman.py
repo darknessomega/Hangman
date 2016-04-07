@@ -1,9 +1,42 @@
-import sqlite3 as sql
-import random
-import string
-from Tkinter import * 
+import sqlite3 as sql, random, string, time
+from Tkinter import *
 
- 
+class ValidatingEntry(Entry):
+    # base class for validating entry widgets
+
+    def __init__(self, master, value="", **kw):
+        apply(Entry.__init__, (self, master), kw)
+        self.__value = value
+        self.__variable = StringVar()
+        self.__variable.set(value)
+        self.__variable.trace("w", self.__callback)
+        self.config(textvariable=self.__variable)
+
+    def __callback(self, *dummy):
+        value = self.__variable.get()
+        newvalue = self.validate(value)
+        if newvalue is None:
+            self.__variable.set(self.__value)
+        elif newvalue != value:
+            self.__value = newvalue
+            self.__variable.set(self.newvalue)
+        else:
+            self.__value = value
+
+    def validate(self, value):
+        # override: return value, new value, or None if invalid
+        return value
+
+class MaxLengthEntry(ValidatingEntry):
+
+    def __init__(self, master, value="", maxlength=None, **kw):
+        self.maxlength = maxlength
+        apply(ValidatingEntry.__init__, (self, master), kw)
+
+    def validate(self, value):
+        if self.maxlength is None or len(value) <= self.maxlength:
+            return value
+        return None # new value too long
 
 conn = sql.connect('dictionary.db')
 conn.text_factory = str
@@ -33,18 +66,27 @@ def retrieve_word_contained():
     return_word = word_contained_entry.get()
     return return_word
 
-def search_dict():
+def search_dict_word():
     test_word = retrieve_word_contained()
     cur.execute('SELECT word FROM eng_dict WHERE def LIKE ?', ('%' + test_word + '%',))
     return cur.fetchall()
 
 game_word = ['']
 def get_game_word(game_word):
-    search_results = search_dict()
+    search_results = search_dict_word()
     game_word_tuple = random.choice(search_results)
     game_word[0] = string.join(game_word_tuple).lower()[3:]
     return game_word
 
+def search_dict_def(game_word):
+    cur.execute('SELECT def FROM eng_dict WHERE word LIKE ?', ('%' + ' ' + game_word[0],))
+    return cur.fetchall()
+
+game_def = ['']    
+def get_game_def():
+    game_def[0] = string.join(search_dict_def(game_word)[0])
+    print game_def[0]
+    
 
 correct_letter_indices = []
 incorrect_letter_spaces = []
@@ -99,7 +141,22 @@ def edit_letter_space(letter_spaces, count, indices = None):
         print count
         incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(letter_spaces))
         return count
-            
+
+    
+
+def game_over():
+    top_frame.pack_forget()
+    middle_frame.pack_forget()
+    bottom_frame.pack_forget()
+    game_over_frame = Frame(bg = 'red')
+    game_over_frame.pack(expand = YES, fill = BOTH)
+    game_over_label = Label(game_over_frame, bg = 'white', font = 40, text = 'GAME OVER!')
+    game_over_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+    try_again = Button(game_over_frame, text = 'Try again?', font = 40, relief = RAISED)
+    try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+    
+    
+    
     
 def letter_guess_button_cmd():
     match_check(match)
@@ -108,15 +165,17 @@ def letter_guess_button_cmd():
         edit_letter_space(correct_letter_spaces, incorrectLettersCount[0], correct_letter_indices)
     if (match[0] == 'False'):
         incorrectLettersCount[0] = edit_letter_space(incorrect_letter_spaces, incorrectLettersCount[0])
-         
+    letter_guess_entry.delete(0, END)
+    if (incorrectLettersCount[0] == 10):
+        game_over()
+           
 
-        
-
-letter_guess_entry = Entry(bottom_frame)
+letter_guess_entry = MaxLengthEntry(bottom_frame, width = 2, maxlength = 1, font = 40)
 letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
 
 def word_contained_button_cmd():
     get_game_word(game_word)
+    get_game_def()
     initial_correct_letter_space(correctLetters, correct_letter_spaces)
     initial_incorrect_letter_space(incorrectLetters)
     print game_word[0]
@@ -128,7 +187,6 @@ def word_contained_button_cmd():
 
 word_contained_button = Button(bottom_frame, text = 'Submit search word', command = word_contained_button_cmd)
 word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
-
 
 ##Entry Frame END##
 
