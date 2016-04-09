@@ -62,31 +62,16 @@ bottom_frame_label.pack()
 word_contained_entry = Entry(bottom_frame)
 word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 
-def retrieve_word_contained():
-    return_word = word_contained_entry.get()
-    return return_word
-
-def search_dict_word():
-    test_word = retrieve_word_contained()
-    cur.execute('SELECT word FROM eng_dict WHERE def LIKE ?', ('%' + test_word + '%',))
-    return cur.fetchall()
-
-game_word = ['']
-def get_game_word(game_word):
-    search_results = search_dict_word()
-    game_word_tuple = random.choice(search_results)
-    game_word[0] = string.join(game_word_tuple).lower()[3:]
-    return game_word
-
-def search_dict_def(game_word):
-    cur.execute('SELECT def FROM eng_dict WHERE word LIKE ?', ('%' + ' ' + game_word[0],))
-    return cur.fetchall()
-
-game_def = ['']    
-def get_game_def():
-    game_def[0] = string.join(search_dict_def(game_word)[0])
-    print game_def[0]
-    
+game_info = ['', '']
+def get_game_info(game_info):
+    test_word = word_contained_entry.get()
+    cur.execute('SELECT word, def FROM eng_dict WHERE def LIKE ?', ('%' + test_word + '%',))
+    search_results = cur.fetchall()
+    game_info_tuple = random.choice(search_results)
+    game_info[0] = game_info_tuple[0].lower()[3:]
+    game_info[1] = game_info_tuple[1].lower()
+    print game_info
+    return game_info
 
 correct_letter_indices = []
 incorrect_letter_spaces = []
@@ -95,14 +80,13 @@ correctLetters = StringVar()
 incorrectLetters = StringVar()
 incorrectLettersCount = [0]
 
-
 def initial_correct_letter_space(correctLetters, letter_spaces):
-    for i in range(len(game_word[0])):
+    for i in range(len(game_info[0])):
         letter_spaces += '_'
     string_letter_spaces = string.join(letter_spaces)
     correctLetters.set(string_letter_spaces)
-    word_frame_game_word = Label(word_frame, font = 40, textvariable = correctLetters , bg = 'white')
-    word_frame_game_word.pack(padx = 4, pady = 4)
+    word_frame_game_info = Label(word_frame, font = 40, textvariable = correctLetters , bg = 'white')
+    word_frame_game_info.pack(padx = 4, pady = 4)
     return letter_spaces
 
 def initial_incorrect_letter_space(incorrectLetters):
@@ -114,16 +98,16 @@ match = ['False']
 def match_check(match):
     match[0] = 'False'
     guess = letter_guess_entry.get()
-    for i in range(len(game_word[0])):
-        if(guess == game_word[0][i]):
+    for i in range(len(game_info[0])):
+        if(guess == game_info[0][i]):
             match[0] = 'True'
     return match
     
 def match_action(indices, letters, match):
     guess = letter_guess_entry.get()
     if (match[0] == 'True'):
-        for i in range(len(game_word[0])):
-            if(guess == game_word[0][i]):
+        for i in range(len(game_info[0])):
+            if(guess == game_info[0][i]):
                 indices.append(i)
         return indices
     if(match[0] == 'False'):
@@ -133,7 +117,7 @@ def match_action(indices, letters, match):
 def edit_letter_space(letter_spaces, count, indices = None):
     if (indices != None):
         for i in indices:
-            letter_spaces[i] = game_word[0][i]
+            letter_spaces[i] = game_info[0][i]
             correctLetters.set(string.join(letter_spaces))
         return letter_spaces
     if (indices == None):
@@ -174,11 +158,9 @@ letter_guess_entry = MaxLengthEntry(bottom_frame, width = 2, maxlength = 1, font
 letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
 
 def word_contained_button_cmd():
-    get_game_word(game_word)
-    get_game_def()
+    get_game_info(game_info)
     initial_correct_letter_space(correctLetters, correct_letter_spaces)
     initial_incorrect_letter_space(incorrectLetters)
-    print game_word[0]
     word_contained_entry.pack_forget()  
     letter_guess_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
     word_contained_button.pack_forget()
