@@ -126,8 +126,19 @@ def edit_letter_space(letter_spaces, count, indices = None):
         incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(letter_spaces))
         return count
 
-    
 
+def clue_button_cmd():
+    clue_label = Label(clue_frame, text = game_info[1], font = 32)
+    clue_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+    clue_button.pack_forget()
+
+
+clue_frame = Frame(middle_frame, bg = 'light green')
+clue_frame.pack(side = LEFT, fill = BOTH, expand = YES)
+clue_frame_label = Label(clue_frame, text = 'Clue')
+clue_frame_label.pack()
+clue_button = Button(clue_frame, text = 'Show clue', font = 32, relief = RAISED, command = clue_button_cmd)
+    
 def game_over():
     top_frame.pack_forget()
     middle_frame.pack_forget()
@@ -137,14 +148,13 @@ def game_over():
     game_over_label = Label(game_over_frame, bg = 'white', font = 40, text = 'GAME OVER!')
     game_over_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
     try_again = Button(game_over_frame, text = 'Try again?', font = 40, relief = RAISED)
-    try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-    
-    
-    
+    try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)    
     
 def letter_guess_button_cmd():
     match_check(match)
     match_action(correct_letter_indices, incorrect_letter_spaces, match)
+    if (incorrectLettersCount[0] == 4):
+        clue_button.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
     if (match[0] == 'True'):
         edit_letter_space(correct_letter_spaces, incorrectLettersCount[0], correct_letter_indices)
     if (match[0] == 'False'):
@@ -194,10 +204,7 @@ hangman_frame_label.pack()
 
 ##Clue Frame BEGIN##
 
-clue_frame = Frame(middle_frame, bg = 'light green')
-clue_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-clue_frame_label = Label(clue_frame, text = 'Clue')
-clue_frame_label.pack()
+
 
 ##Clue Frame END##
 
