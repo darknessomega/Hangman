@@ -44,6 +44,8 @@ cur = conn.cursor()
 
 root = Tk()
 root.title("Modified Hangman")
+root.resizable(width = FALSE, height = FALSE)
+root.geometry('{}x{}'.format(750, 500))
 
 top_frame = Frame(root)
 top_frame.pack(side = TOP, fill = BOTH, expand = YES)
@@ -53,14 +55,71 @@ middle_frame.pack(side = TOP, fill = BOTH, expand = YES)
 
 ##Entry Frame BEGIN##
 
-bottom_frame = Frame(root, bg = 'yellow')
+bottom_frame = Frame(root, bg = 'white')
 bottom_frame.pack(side = BOTTOM, fill = BOTH, expand = YES)
 
-bottom_frame_label = Label(bottom_frame, anchor = S, text = 'Entry')
-bottom_frame_label.pack()
+##bottom_frame_label = Label(bottom_frame, anchor = S, text = 'Entry')
+##bottom_frame_label.pack()
 
+word_contained_entry_label = Label(bottom_frame, bg = 'white', font = 32, text = 'Please enter a search word:')
+word_contained_entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 word_contained_entry = Entry(bottom_frame)
 word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
+
+
+##Entry Frame END##
+
+##Word Frame BEGIN##
+
+word_frame = Frame(top_frame, bg = 'white')
+word_frame.pack(side = LEFT, fill = BOTH, expand = YES)
+##word_frame_label = Label(word_frame, text = 'Word')
+##word_frame_label.pack()
+
+
+##Word Frame END##
+
+##Hangman Frame BEGIN##
+
+hangman_frame = Frame(top_frame, bg = 'white')
+hangman_frame.pack(side = LEFT, fill = BOTH, expand = YES)
+##hangman_frame_label = Label(hangman_frame, text = 'Hangman')
+##hangman_frame_label.pack()
+
+##Hangman Frame END##
+
+##Clue Frame BEGIN##
+
+
+##Clue Frame END##
+
+##Letters Frame BEGIN##
+
+letters_frame = Frame(middle_frame, bg = 'white')
+letters_frame.pack(side = RIGHT, fill = BOTH, expand = YES)
+##letters_frame_label = Label(letters_frame, text = 'Letters Tried')
+##letters_frame_label.pack()
+
+canvas = Canvas(hangman_frame, bg = 'white', width = 200, height = 250)
+canvas.pack()
+hangman_image1 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage1.GIF')
+hangman_image2 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage2.GIF')
+hangman_image3 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage3.GIF')
+hangman_image4 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage4.GIF')
+hangman_image5 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage5.GIF')
+hangman_image6 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage6.GIF')
+hangman_image7 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage7.GIF')
+hangman_image8 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage8.GIF')
+hangman_image9 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage9.GIF')
+
+
+
+
+
+
+
+##Letters Frame END#
+
 
 game_info = ['', '']
 def get_game_info(game_info):
@@ -111,7 +170,8 @@ def match_action(indices, letters, match):
                 indices.append(i)
         return indices
     if(match[0] == 'False'):
-        letters.append(guess)
+        if(guess not in letters):
+            letters.append(guess)
         return letters
 
 def edit_letter_space(letter_spaces, count, indices = None):
@@ -126,17 +186,16 @@ def edit_letter_space(letter_spaces, count, indices = None):
         incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(letter_spaces))
         return count
 
-
 def clue_button_cmd():
-    clue_label = Label(clue_frame, text = game_info[1], font = 32)
+    clue_label = Label(clue_frame, text = game_info[1], font = 32, wraplength = 300, justify = LEFT)
     clue_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
     clue_button.pack_forget()
 
 
-clue_frame = Frame(middle_frame, bg = 'light green')
+clue_frame = Frame(middle_frame, bg = 'white')
 clue_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-clue_frame_label = Label(clue_frame, text = 'Clue')
-clue_frame_label.pack()
+##clue_frame_label = Label(clue_frame, text = 'Clue')
+##clue_frame_label.pack()
 clue_button = Button(clue_frame, text = 'Show clue', font = 32, relief = RAISED, command = clue_button_cmd)
     
 def game_over():
@@ -153,13 +212,14 @@ def game_over():
 def letter_guess_button_cmd():
     match_check(match)
     match_action(correct_letter_indices, incorrect_letter_spaces, match)
-    if (incorrectLettersCount[0] == 4):
-        clue_button.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
     if (match[0] == 'True'):
         edit_letter_space(correct_letter_spaces, incorrectLettersCount[0], correct_letter_indices)
     if (match[0] == 'False'):
         incorrectLettersCount[0] = edit_letter_space(incorrect_letter_spaces, incorrectLettersCount[0])
     letter_guess_entry.delete(0, END)
+    edit_hangman_space(incorrectLettersCount)
+    if (incorrectLettersCount[0] == 5):
+        clue_button.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
     if (incorrectLettersCount[0] == 10):
         game_over()
            
@@ -167,7 +227,7 @@ def letter_guess_button_cmd():
 letter_guess_entry = MaxLengthEntry(bottom_frame, width = 2, maxlength = 1, font = 40)
 letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
 
-def word_contained_button_cmd():
+def word_contained_button_cmd(mwcb_flag):
     get_game_info(game_info)
     initial_correct_letter_space(correctLetters, correct_letter_spaces)
     initial_incorrect_letter_space(incorrectLetters)
@@ -175,45 +235,42 @@ def word_contained_button_cmd():
     letter_guess_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
     word_contained_button.pack_forget()
     letter_guess_button.pack(side = LEFT, anchor = S, pady = 1)
+    print mwcb_flag
+    if (mwcb_flag == True):
+        user_warning_label.pack_forget()
     
-
-word_contained_button = Button(bottom_frame, text = 'Submit search word', command = word_contained_button_cmd)
+mwcb_flag = False
+def make_word_contained_button(mwcb_flag):
+    if (len(word_contained_entry.get()) > 0):
+        word_contained_button_cmd(mwcb_flag)
+    else:
+        user_warning_label = Label(bottom_frame, font = 40, bg = 'white', fg = 'red', text = 'Make sure to enter a word!!!')
+        user_warning_label.pack(side = LEFT)
+        mwcb_flag = True
+    return mwcb_flag
+word_contained_button = Button(bottom_frame, text = 'Submit search word', command = lambda: make_word_contained_button(mwcb_flag))
 word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
 
-##Entry Frame END##
-
-##Word Frame BEGIN##
-
-word_frame = Frame(top_frame, bg = 'red')
-word_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-word_frame_label = Label(word_frame, text = 'Word')
-word_frame_label.pack()
-
-
-
-##Word Frame END##
-
-##Hangman Frame BEGIN##
-
-hangman_frame = Frame(top_frame, bg = 'purple')
-hangman_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-hangman_frame_label = Label(hangman_frame, text = 'Hangman')
-hangman_frame_label.pack()
-
-##Hangman Frame END##
-
-##Clue Frame BEGIN##
-
-
-
-##Clue Frame END##
-
-##Letters Frame BEGIN##
-
-letters_frame = Frame(middle_frame, bg = 'orange')
-letters_frame.pack(side = RIGHT, fill = BOTH, expand = YES)
-letters_frame_label = Label(letters_frame, text = 'Letters Tried')
-letters_frame_label.pack()
+def edit_hangman_space(IncorrectLettersCount):
+    if (IncorrectLettersCount[0] == 1):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image1)
+    if (IncorrectLettersCount[0] == 2):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image2)
+    if (IncorrectLettersCount[0] == 3):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image3)
+    if (IncorrectLettersCount[0] == 4):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image4)
+    if (IncorrectLettersCount[0] == 5):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image5)
+    if (IncorrectLettersCount[0] == 6):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image6)
+    if (IncorrectLettersCount[0] == 7):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image7)
+    if (IncorrectLettersCount[0] == 8):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image8)
+    if (IncorrectLettersCount[0] == 9):
+        hangman_display = canvas.create_image(100, 125, image = hangman_image9)
+        
 
 
 
@@ -222,7 +279,9 @@ letters_frame_label.pack()
 
 
 
-##Letters Frame END#
+
+
+
 
 
 mainloop()
