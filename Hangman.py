@@ -61,8 +61,10 @@ bottom_frame.pack(side = BOTTOM, fill = BOTH, expand = YES)
 ##bottom_frame_label = Label(bottom_frame, anchor = S, text = 'Entry')
 ##bottom_frame_label.pack()
 
-word_contained_entry_label = Label(bottom_frame, bg = 'white', font = 32, text = 'Please enter a search word:')
-word_contained_entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
+entry_label_text = StringVar()
+entry_label_text.set('Please enter a search word:')
+entry_label = Label(bottom_frame, bg = 'white', font = 32, textvariable = entry_label_text)
+entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 word_contained_entry = Entry(bottom_frame)
 word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 
@@ -227,7 +229,15 @@ def letter_guess_button_cmd():
 letter_guess_entry = MaxLengthEntry(bottom_frame, width = 2, maxlength = 1, font = 40)
 letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
 
-def word_contained_button_cmd(mwcb_flag):
+def make_word_contained_button():
+    if (len(word_contained_entry.get()) > 0):
+        word_contained_button_cmd()
+    else:
+        search_reminder()
+word_contained_button = Button(bottom_frame, text = 'Submit search word', command = make_word_contained_button)
+word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
+
+def word_contained_button_cmd():
     get_game_info(game_info)
     initial_correct_letter_space(correctLetters, correct_letter_spaces)
     initial_incorrect_letter_space(incorrectLetters)
@@ -235,21 +245,24 @@ def word_contained_button_cmd(mwcb_flag):
     letter_guess_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
     word_contained_button.pack_forget()
     letter_guess_button.pack(side = LEFT, anchor = S, pady = 1)
-    print mwcb_flag
-    if (mwcb_flag == True):
-        user_warning_label.pack_forget()
-    
-mwcb_flag = False
-def make_word_contained_button(mwcb_flag):
-    if (len(word_contained_entry.get()) > 0):
-        word_contained_button_cmd(mwcb_flag)
-    else:
-        user_warning_label = Label(bottom_frame, font = 40, bg = 'white', fg = 'red', text = 'Make sure to enter a word!!!')
-        user_warning_label.pack(side = LEFT)
-        mwcb_flag = True
-    return mwcb_flag
-word_contained_button = Button(bottom_frame, text = 'Submit search word', command = lambda: make_word_contained_button(mwcb_flag))
-word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
+    entry_label_text.set('Please enter a letter guess:')
+
+def search_warning_button_cmd():
+    search_warning.withdraw()
+    root.deiconify()
+
+search_warning = Toplevel()
+search_warning.withdraw()
+search_warning_message = Label(search_warning, text = 'Please make sure to enter a search word!', font = 40, fg = 'red')
+search_warning_button = Button(search_warning, text = 'Try again', font = 32, command = search_warning_button_cmd)
+search_warning.title('Error')
+
+def search_reminder():
+    search_warning.deiconify()
+    search_warning_message.pack(padx = 6, pady = 6)
+    search_warning_button.pack()
+    root.withdraw()
+    search_warning.mainloop()
 
 def edit_hangman_space(IncorrectLettersCount):
     if (IncorrectLettersCount[0] == 1):
@@ -271,8 +284,6 @@ def edit_hangman_space(IncorrectLettersCount):
     if (IncorrectLettersCount[0] == 9):
         hangman_display = canvas.create_image(100, 125, image = hangman_image9)
         
-
-
 
 
 
