@@ -199,17 +199,36 @@ clue_frame.pack(side = LEFT, fill = BOTH, expand = YES)
 ##clue_frame_label = Label(clue_frame, text = 'Clue')
 ##clue_frame_label.pack()
 clue_button = Button(clue_frame, text = 'Show clue', font = 32, relief = RAISED, command = clue_button_cmd)
+
+def clear_setup(game_info, correct_letter_indices, incorrect_letter_spaces, correct_letter_spaces, correctLetters, incorrectLetters, incorrectLettersCount):
+    game_info = ['', '']
+    correct_letter_indices = []
+    incorrect_letter_spaces = []
+    correct_letter_spaces = []
+    correctLetters = StringVar()
+    incorrectLetters = StringVar()
+    incorrectLettersCount[0] = 0 
+    get_game_info(game_info)
+    initial_correct_letter_space(correctLetters, correct_letter_spaces)
+    initial_incorrect_letter_space(incorrectLetters)
+
+def try_again_button_cmd():
+    game_over_window.withdraw()
+    root.deiconify()
+    ##clear_setup(game_info, correct_letter_indices, incorrect_letter_spaces, correct_letter_spaces, correctLetters, incorrectLetters, incorrectLettersCount)
     
+
+game_over_window = Toplevel(bg = 'red')
+game_over_window.title('Modified Hangman')
+game_over_message = Label(game_over_window, bg = 'white', font = 40, text = 'GAME OVER!')
+game_over_message.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+try_again = Button(game_over_window, text = 'Try again?', font = 40, relief = RAISED, command = try_again_button_cmd)
+try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+game_over_window.withdraw()
+
 def game_over():
-    top_frame.pack_forget()
-    middle_frame.pack_forget()
-    bottom_frame.pack_forget()
-    game_over_frame = Frame(bg = 'red')
-    game_over_frame.pack(expand = YES, fill = BOTH)
-    game_over_label = Label(game_over_frame, bg = 'white', font = 40, text = 'GAME OVER!')
-    game_over_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-    try_again = Button(game_over_frame, text = 'Try again?', font = 40, relief = RAISED)
-    try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)    
+    root.withdraw()
+    game_over_window.deiconify()
     
 def letter_guess_button_cmd():
     match_check(match)
@@ -251,18 +270,18 @@ def search_warning_button_cmd():
     search_warning.withdraw()
     root.deiconify()
 
-search_warning = Toplevel()
+search_warning = Toplevel(bg = 'red')
 search_warning.withdraw()
-search_warning_message = Label(search_warning, text = 'Please make sure to enter a search word!', font = 40, fg = 'red')
-search_warning_button = Button(search_warning, text = 'Try again', font = 32, command = search_warning_button_cmd)
-search_warning.title('Error')
+search_warning_message = Label(search_warning, text = 'Please make sure to enter a search word!', font = 40, bg = 'white')
+search_warning_button = Button(search_warning, text = 'Try again', font = 32, command = search_warning_button_cmd, relief = RAISED)
+search_warning.title('Modified Hangman')
 
 def search_reminder():
     search_warning.deiconify()
     search_warning_message.pack(padx = 6, pady = 6)
     search_warning_button.pack()
     root.withdraw()
-    search_warning.mainloop()
+    ##search_warning.mainloop()
 
 def edit_hangman_space(IncorrectLettersCount):
     if (IncorrectLettersCount[0] == 1):
