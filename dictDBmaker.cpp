@@ -22,6 +22,10 @@ int main()
 	while (!oldTxt.eof())
 	{
 		getline (oldTxt, oldData);
+		if (oldData.substr(0,3) == "   ")
+		{
+			oldData = oldData.substr(3);
+		}
 		looper = oldData.length();
 		looper2 = oldData.length();
 		index = 0;
