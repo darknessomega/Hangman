@@ -105,12 +105,12 @@ incorrectLettersCount = [0]
 
 word_frame_game_info = Label(word_frame, font = 40, textvariable = correctLetters , bg = 'white')
 
-def initial_correct_letter_space(correctLetters, letter_spaces):
+def initial_correct_letter_space(correctLetters, correct_letter_spaces):
     for i in range(len(game_info[0])):
-        letter_spaces += '_'
-    string_letter_spaces = string.join(letter_spaces)
+        correct_letter_spaces += '_'
+    string_letter_spaces = string.join(correct_letter_spaces)
     correctLetters.set(string_letter_spaces)
-    return letter_spaces
+    return correct_letter_spaces
 
 letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrectLetters, bg = 'white')
 letters_frame_incorrect_tries.pack()
@@ -141,7 +141,7 @@ def word_contained_button_cmd():
 
 def search_warning_button_cmd():
     search_warning.withdraw()
-    root.deiconify()
+    ##root.deiconify()
 
 search_warning = Toplevel(bg = 'red')
 search_warning.withdraw()
@@ -153,7 +153,7 @@ def search_reminder():
     search_warning.deiconify()
     search_warning_message.pack(padx = 6, pady = 6)
     search_warning_button.pack()
-    root.withdraw()
+    ##root.withdraw()
     ##search_warning.mainloop()
 
 clue_frame = Frame(middle_frame, bg = 'white')
@@ -189,16 +189,16 @@ def match_action(indices, letters, match):
             letters.append(guess)
         return letters
 
-def edit_letter_space(letter_spaces, count, indices = None):
+def edit_letter_space(correct_letter_spaces, count, indices = None):
     if (indices != None):
         for i in indices:
-            letter_spaces[i] = game_info[0][i]
-            correctLetters.set(string.join(letter_spaces))
-        return letter_spaces
+            correct_letter_spaces[i] = game_info[0][i]
+            correctLetters.set(string.join(correct_letter_spaces))
+        return correct_letter_spaces
     if (indices == None):
         count += 1
         print count
-        incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(letter_spaces))
+        incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(correct_letter_spaces))
         return count
 
 def edit_hangman_space(IncorrectLettersCount):
@@ -238,12 +238,11 @@ def letter_guess_button_cmd():
         game_over()
 letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
 
-def clear_setup(correct_letter_spaces):
-    correct_letter_spaces = []
+def clear_setup():
+    correct_letter_spaces[:] = []
     clue_label.pack_forget()
     clue_button.pack_forget()
     incorrectLettersCount[0] = 0
-    word_frame_game_info.pack_forget()
     incorrectLetters.set(initial_incorrect_letter_space(incorrectLetters))
     entry_label_text.set('Please enter a search word:')
     letter_guess_entry.pack_forget()
@@ -251,20 +250,19 @@ def clear_setup(correct_letter_spaces):
     entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
     word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
     word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
-    return correct_letter_spaces
     
 
-def try_again_button_cmd(correct_letter_spaces):
+def try_again_button_cmd():
     game_over_window.withdraw()
+    clear_setup()
     root.deiconify()
-    correct_letter_spaces = clear_setup(correct_letter_spaces)
-    return correct_letter_spaces
+    
     
 game_over_window = Toplevel(bg = 'red')
 game_over_window.title('Modified Hangman')
 game_over_message = Label(game_over_window, bg = 'white', font = 40, text = 'GAME OVER!')
 game_over_message.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-try_again = Button(game_over_window, text = 'Try again?', font = 40, relief = RAISED, command = lambda: try_again_button_cmd(correct_letter_spaces))
+try_again = Button(game_over_window, text = 'Try again?', font = 40, relief = RAISED, command = try_again_button_cmd)
 try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
 game_over_window.withdraw()
 
