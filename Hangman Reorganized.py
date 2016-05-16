@@ -86,6 +86,7 @@ hangman_image7 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23
 hangman_image8 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage8.GIF')
 hangman_image9 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage9.GIF')
 
+
 def get_game_info(game_info):
     test_word = word_contained_entry.get()
     cur.execute('SELECT word, def FROM eng_dict WHERE def LIKE ?', ('%' + test_word + '%',))
@@ -269,5 +270,25 @@ game_over_window.withdraw()
 def game_over():
     root.withdraw()
     game_over_window.deiconify()
+
+welcome_screen = Toplevel(bg = 'white')
+welcome_screen.title('Modified Hangman')
+welcome_screen.resizable(width = FALSE, height = FALSE)
+welcome_screen.geometry('{}x{}'.format(740, 620))
+
+def begin_button_cmd():
+    welcome_screen.withdraw()
+    root.deiconify()
+
+def welcome():
+    welcome_screen_text = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Welcome_Screen.GIF')
+    background = Label(welcome_screen, image = welcome_screen_text)
+    background.welcome_screen_text = welcome_screen_text
+    background.pack()
+    begin_button = Button(welcome_screen, text = 'Let''s play!', font = 40, relief = RAISED, command = begin_button_cmd)
+    begin_button.pack(expand = YES, fill = X, anchor = N)
+    root.withdraw()
+    
+welcome()
 
 mainloop()
