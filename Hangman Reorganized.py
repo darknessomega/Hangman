@@ -47,16 +47,33 @@ cur = conn.cursor()
 root = Tk()
 root.title("Modified Hangman")
 root.resizable(width = FALSE, height = FALSE)
-root.geometry('{}x{}'.format(750, 500))
+root_bg_image = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Background.GIF')
+root_bg = Label(root, image = root_bg_image)
+root_bg.root_bg_image = root_bg_image
+root_bg.place(x=0, y=0, relwidth=1, relheight=1)
+
+# get screen width and height
+ws = root.winfo_screenwidth() # width of the screen
+hs = root.winfo_screenheight() # height of the screen
+def window_position(window, width, height):
+
+    window_width = width
+    window_height = height
+    window_x = (ws/2) - (width/2)
+    window_y = (hs/2) - (height/2)
+    window.geometry('%dx%d+%d+%d' % (window_width, window_height, window_x, window_y))
+    
+window_position(root, 750, 500)
+
+
 
 top_frame = Frame(root)
-top_frame.pack(side = TOP, fill = BOTH, expand = YES)
 
 middle_frame = Frame(root)
-middle_frame.pack(side = TOP, fill = BOTH, expand = YES)
+
 
 bottom_frame = Frame(root, bg = 'white')
-bottom_frame.pack(side = BOTTOM, fill = BOTH, expand = YES)
+bottom_frame.pack(side = BOTTOM, expand = YES)
 
 entry_label_text = StringVar()
 entry_label_text.set('Please enter a search word:')
@@ -66,16 +83,11 @@ word_contained_entry = Entry(bottom_frame)
 word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 
 word_frame = Frame(top_frame, bg = 'white')
-word_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-
 hangman_frame = Frame(top_frame, bg = 'white')
-hangman_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-
 letters_frame = Frame(middle_frame, bg = 'white')
-letters_frame.pack(side = RIGHT, fill = BOTH, expand = YES)
+
 
 canvas = Canvas(hangman_frame, bg = 'white', width = 200, height = 250)
-canvas.pack()
 hangman_image1 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage1.GIF')
 hangman_image2 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage2.GIF')
 hangman_image3 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage3.GIF')
@@ -114,7 +126,7 @@ def initial_correct_letter_space(correctLetters, correct_letter_spaces):
     return correct_letter_spaces
 
 letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrectLetters, bg = 'white')
-letters_frame_incorrect_tries.pack()
+
 
 def initial_incorrect_letter_space(incorrectLetters):
     incorrectLetters.set('Incorrect Tries: ' + str(incorrectLettersCount[0]) + '\n' + string.join(incorrect_letter_spaces))
@@ -129,6 +141,12 @@ word_contained_button = Button(bottom_frame, text = 'Submit search word', comman
 word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
 
 def word_contained_button_cmd():
+    middle_frame.pack(side = TOP, expand = YES)
+    top_frame.pack(side = TOP, expand = YES)
+    word_frame.pack(side = LEFT, expand = YES)
+    hangman_frame.pack(side = LEFT, expand = YES)
+    letters_frame.pack(side = RIGHT, expand = YES)
+    letters_frame_incorrect_tries.pack()
     get_game_info(game_info)
     initial_correct_letter_space(correctLetters, correct_letter_spaces)
     initial_incorrect_letter_space(incorrectLetters)
@@ -142,7 +160,7 @@ def word_contained_button_cmd():
 
 def search_warning_button_cmd():
     search_warning.withdraw()
-    ##root.deiconify()
+    root.deiconify()
 
 search_warning = Toplevel(bg = 'red')
 search_warning.withdraw()
@@ -204,6 +222,7 @@ def edit_letter_space(correct_letter_spaces, count, indices = None):
 
 def edit_hangman_space(IncorrectLettersCount):
     if (IncorrectLettersCount[0] == 1):
+        canvas.pack()
         hangman_display = canvas.create_image(100, 125, image = hangman_image1)
     if (IncorrectLettersCount[0] == 2):
         hangman_display = canvas.create_image(100, 125, image = hangman_image2)
@@ -251,6 +270,11 @@ def clear_setup():
     entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
     word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
     word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
+    middle_frame.pack_forget()
+    top_frame.pack_forget()
+    word_frame.pack_forget()
+    hangman_frame.pack_forget()
+    
     
 
 def try_again_button_cmd():
@@ -276,6 +300,16 @@ welcome_screen.title('Modified Hangman')
 welcome_screen.resizable(width = FALSE, height = FALSE)
 welcome_screen.geometry('{}x{}'.format(740, 620))
 
+window_position(welcome_screen, 740, 620)
+
+
+def instructions_button_cmd():
+    root.withdraw()
+    welcome_screen.deiconify()
+
+instructions_button = Button(bottom_frame, text = 'How to play', font = 40, relief = RAISED, command = instructions_button_cmd)
+instructions_button.pack(side = RIGHT, anchor = E, padx = 2, pady = 1, expand = YES, fill = BOTH)
+
 def begin_button_cmd():
     welcome_screen.withdraw()
     root.deiconify()
@@ -290,5 +324,5 @@ def welcome():
     root.withdraw()
     
 welcome()
-
+##root_bg.pack()
 mainloop()
