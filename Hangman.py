@@ -38,6 +38,8 @@ class MaxLengthEntry(ValidatingEntry):
             return value
         return None # new value too long
 
+game_info = ['', '']
+
 conn = sql.connect('dictionary.db')
 conn.text_factory = str
 cur = conn.cursor()
@@ -46,6 +48,11 @@ root = Tk()
 root.title("Modified Hangman")
 root.resizable(width = FALSE, height = FALSE)
 root.geometry('{}x{}'.format(750, 500))
+root_bg_image = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Background.GIF')
+root_bg = Label(root, image = root_bg_image)
+root_bg.root_bg_image = root_bg_image
+
+
 
 top_frame = Frame(root)
 top_frame.pack(side = TOP, fill = BOTH, expand = YES)
@@ -53,13 +60,8 @@ top_frame.pack(side = TOP, fill = BOTH, expand = YES)
 middle_frame = Frame(root)
 middle_frame.pack(side = TOP, fill = BOTH, expand = YES)
 
-##Entry Frame BEGIN##
-
 bottom_frame = Frame(root, bg = 'white')
 bottom_frame.pack(side = BOTTOM, fill = BOTH, expand = YES)
-
-##bottom_frame_label = Label(bottom_frame, anchor = S, text = 'Entry')
-##bottom_frame_label.pack()
 
 entry_label_text = StringVar()
 entry_label_text.set('Please enter a search word:')
@@ -68,39 +70,14 @@ entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 word_contained_entry = Entry(bottom_frame)
 word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 
-
-##Entry Frame END##
-
-##Word Frame BEGIN##
-
 word_frame = Frame(top_frame, bg = 'white')
 word_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-##word_frame_label = Label(word_frame, text = 'Word')
-##word_frame_label.pack()
-
-
-##Word Frame END##
-
-##Hangman Frame BEGIN##
 
 hangman_frame = Frame(top_frame, bg = 'white')
 hangman_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-##hangman_frame_label = Label(hangman_frame, text = 'Hangman')
-##hangman_frame_label.pack()
-
-##Hangman Frame END##
-
-##Clue Frame BEGIN##
-
-
-##Clue Frame END##
-
-##Letters Frame BEGIN##
 
 letters_frame = Frame(middle_frame, bg = 'white')
 letters_frame.pack(side = RIGHT, fill = BOTH, expand = YES)
-##letters_frame_label = Label(letters_frame, text = 'Letters Tried')
-##letters_frame_label.pack()
 
 canvas = Canvas(hangman_frame, bg = 'white', width = 200, height = 250)
 canvas.pack()
@@ -115,15 +92,6 @@ hangman_image8 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23
 hangman_image9 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage9.GIF')
 
 
-
-
-
-
-
-##Letters Frame END#
-
-
-game_info = ['', '']
 def get_game_info(game_info):
     test_word = word_contained_entry.get()
     cur.execute('SELECT word, def FROM eng_dict WHERE def LIKE ?', ('%' + test_word + '%',))
@@ -141,19 +109,70 @@ correctLetters = StringVar()
 incorrectLetters = StringVar()
 incorrectLettersCount = [0]
 
-def initial_correct_letter_space(correctLetters, letter_spaces):
+word_frame_game_info = Label(word_frame, font = 40, textvariable = correctLetters , bg = 'white')
+
+def initial_correct_letter_space(correctLetters, correct_letter_spaces):
     for i in range(len(game_info[0])):
-        letter_spaces += '_'
-    string_letter_spaces = string.join(letter_spaces)
+        correct_letter_spaces += '_'
+    string_letter_spaces = string.join(correct_letter_spaces)
     correctLetters.set(string_letter_spaces)
-    word_frame_game_info = Label(word_frame, font = 40, textvariable = correctLetters , bg = 'white')
-    word_frame_game_info.pack(padx = 4, pady = 4)
-    return letter_spaces
+    return correct_letter_spaces
+
+letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrectLetters, bg = 'white')
+letters_frame_incorrect_tries.pack()
 
 def initial_incorrect_letter_space(incorrectLetters):
     incorrectLetters.set('Incorrect Tries: ' + str(incorrectLettersCount[0]) + '\n' + string.join(incorrect_letter_spaces))
-    letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrectLetters, bg = 'white')
-    letters_frame_incorrect_tries.pack()
+   
+
+def make_word_contained_button():
+    if (len(word_contained_entry.get()) > 0):
+        word_contained_button_cmd()
+    else:
+        search_reminder()
+word_contained_button = Button(bottom_frame, text = 'Submit search word', command = make_word_contained_button)
+word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
+
+def word_contained_button_cmd():
+    get_game_info(game_info)
+    initial_correct_letter_space(correctLetters, correct_letter_spaces)
+    initial_incorrect_letter_space(incorrectLetters)
+    word_contained_entry.delete(0, END)
+    word_contained_entry.pack_forget()  
+    letter_guess_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
+    word_contained_button.pack_forget()
+    word_frame_game_info.pack(padx = 4, pady = 4)
+    letter_guess_button.pack(side = LEFT, anchor = S, pady = 1)
+    entry_label_text.set('Please enter a letter guess:')
+
+def search_warning_button_cmd():
+    search_warning.withdraw()
+    ##root.deiconify()
+
+search_warning = Toplevel(bg = 'red')
+search_warning.withdraw()
+search_warning_message = Label(search_warning, text = 'Please make sure to enter a search word!', font = 40, bg = 'white')
+search_warning_button = Button(search_warning, text = 'Try again', font = 32, command = search_warning_button_cmd, relief = RAISED)
+search_warning.title('Modified Hangman')
+
+def search_reminder():
+    search_warning.deiconify()
+    search_warning_message.pack(padx = 6, pady = 6)
+    search_warning_button.pack()
+    ##root.withdraw()
+    ##search_warning.mainloop()
+
+clue_frame = Frame(middle_frame, bg = 'white')
+clue_frame.pack(side = LEFT, fill = BOTH, expand = YES)
+clue_label_text = StringVar()
+clue_label = Label(clue_frame, textvariable = clue_label_text, font = 32, wraplength = 300, justify = LEFT)
+def clue_button_cmd():
+    clue_label_text.set(game_info[1])
+    clue_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+    clue_button.pack_forget()
+##clue_frame_label = Label(clue_frame, text = 'Clue')
+##clue_frame_label.pack()
+clue_button = Button(clue_frame, text = 'Show clue', font = 32, relief = RAISED, command = clue_button_cmd)
 
 match = ['False']
 def match_check(match):
@@ -176,112 +195,17 @@ def match_action(indices, letters, match):
             letters.append(guess)
         return letters
 
-def edit_letter_space(letter_spaces, count, indices = None):
+def edit_letter_space(correct_letter_spaces, count, indices = None):
     if (indices != None):
         for i in indices:
-            letter_spaces[i] = game_info[0][i]
-            correctLetters.set(string.join(letter_spaces))
-        return letter_spaces
+            correct_letter_spaces[i] = game_info[0][i]
+            correctLetters.set(string.join(correct_letter_spaces))
+        return correct_letter_spaces
     if (indices == None):
         count += 1
         print count
-        incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(letter_spaces))
+        incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(correct_letter_spaces))
         return count
-
-def clue_button_cmd():
-    clue_label = Label(clue_frame, text = game_info[1], font = 32, wraplength = 300, justify = LEFT)
-    clue_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-    clue_button.pack_forget()
-
-
-clue_frame = Frame(middle_frame, bg = 'white')
-clue_frame.pack(side = LEFT, fill = BOTH, expand = YES)
-##clue_frame_label = Label(clue_frame, text = 'Clue')
-##clue_frame_label.pack()
-clue_button = Button(clue_frame, text = 'Show clue', font = 32, relief = RAISED, command = clue_button_cmd)
-
-def clear_setup(game_info, correct_letter_indices, incorrect_letter_spaces, correct_letter_spaces, correctLetters, incorrectLetters, incorrectLettersCount):
-    game_info = ['', '']
-    correct_letter_indices = []
-    incorrect_letter_spaces = []
-    correct_letter_spaces = []
-    correctLetters = StringVar()
-    incorrectLetters = StringVar()
-    incorrectLettersCount[0] = 0 
-    get_game_info(game_info)
-    initial_correct_letter_space(correctLetters, correct_letter_spaces)
-    initial_incorrect_letter_space(incorrectLetters)
-
-def try_again_button_cmd():
-    game_over_window.withdraw()
-    root.deiconify()
-    ##clear_setup(game_info, correct_letter_indices, incorrect_letter_spaces, correct_letter_spaces, correctLetters, incorrectLetters, incorrectLettersCount)
-    
-
-game_over_window = Toplevel(bg = 'red')
-game_over_window.title('Modified Hangman')
-game_over_message = Label(game_over_window, bg = 'white', font = 40, text = 'GAME OVER!')
-game_over_message.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-try_again = Button(game_over_window, text = 'Try again?', font = 40, relief = RAISED, command = try_again_button_cmd)
-try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-game_over_window.withdraw()
-
-def game_over():
-    root.withdraw()
-    game_over_window.deiconify()
-    
-def letter_guess_button_cmd():
-    match_check(match)
-    match_action(correct_letter_indices, incorrect_letter_spaces, match)
-    if (match[0] == 'True'):
-        edit_letter_space(correct_letter_spaces, incorrectLettersCount[0], correct_letter_indices)
-    if (match[0] == 'False'):
-        incorrectLettersCount[0] = edit_letter_space(incorrect_letter_spaces, incorrectLettersCount[0])
-    letter_guess_entry.delete(0, END)
-    edit_hangman_space(incorrectLettersCount)
-    if (incorrectLettersCount[0] == 5):
-        clue_button.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-    if (incorrectLettersCount[0] == 10):
-        game_over()
-           
-
-letter_guess_entry = MaxLengthEntry(bottom_frame, width = 2, maxlength = 1, font = 40)
-letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
-
-def make_word_contained_button():
-    if (len(word_contained_entry.get()) > 0):
-        word_contained_button_cmd()
-    else:
-        search_reminder()
-word_contained_button = Button(bottom_frame, text = 'Submit search word', command = make_word_contained_button)
-word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
-
-def word_contained_button_cmd():
-    get_game_info(game_info)
-    initial_correct_letter_space(correctLetters, correct_letter_spaces)
-    initial_incorrect_letter_space(incorrectLetters)
-    word_contained_entry.pack_forget()  
-    letter_guess_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
-    word_contained_button.pack_forget()
-    letter_guess_button.pack(side = LEFT, anchor = S, pady = 1)
-    entry_label_text.set('Please enter a letter guess:')
-
-def search_warning_button_cmd():
-    search_warning.withdraw()
-    root.deiconify()
-
-search_warning = Toplevel(bg = 'red')
-search_warning.withdraw()
-search_warning_message = Label(search_warning, text = 'Please make sure to enter a search word!', font = 40, bg = 'white')
-search_warning_button = Button(search_warning, text = 'Try again', font = 32, command = search_warning_button_cmd, relief = RAISED)
-search_warning.title('Modified Hangman')
-
-def search_reminder():
-    search_warning.deiconify()
-    search_warning_message.pack(padx = 6, pady = 6)
-    search_warning_button.pack()
-    root.withdraw()
-    ##search_warning.mainloop()
 
 def edit_hangman_space(IncorrectLettersCount):
     if (IncorrectLettersCount[0] == 1):
@@ -302,19 +226,81 @@ def edit_hangman_space(IncorrectLettersCount):
         hangman_display = canvas.create_image(100, 125, image = hangman_image8)
     if (IncorrectLettersCount[0] == 9):
         hangman_display = canvas.create_image(100, 125, image = hangman_image9)
-        
 
+letter_guess_entry = MaxLengthEntry(bottom_frame, width = 2, maxlength = 1, font = 40)
+def letter_guess_button_cmd():
+    match_check(match)
+    match_action(correct_letter_indices, incorrect_letter_spaces, match)
+    if (match[0] == 'True'):
+        edit_letter_space(correct_letter_spaces, incorrectLettersCount[0], correct_letter_indices)
+    if (match[0] == 'False'):
+        incorrectLettersCount[0] = edit_letter_space(incorrect_letter_spaces, incorrectLettersCount[0])
+    letter_guess_entry.delete(0, END)
+    edit_hangman_space(incorrectLettersCount)
+    if (incorrectLettersCount[0] == 5):
+        ##clue_label.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+        clue_button.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+    if (incorrectLettersCount[0] == 10):
+        game_over()
+letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
 
+def clear_setup():
+    correct_letter_spaces[:] = []
+    clue_label.pack_forget()
+    clue_button.pack_forget()
+    incorrectLettersCount[0] = 0
+    incorrectLetters.set(initial_incorrect_letter_space(incorrectLetters))
+    entry_label_text.set('Please enter a search word:')
+    letter_guess_entry.pack_forget()
+    letter_guess_button.pack_forget()
+    entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
+    word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
+    word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
+    
 
+def try_again_button_cmd():
+    game_over_window.withdraw()
+    clear_setup()
+    root.deiconify()
+    
+    
+game_over_window = Toplevel(bg = 'red')
+game_over_window.title('Modified Hangman')
+game_over_message = Label(game_over_window, bg = 'white', font = 40, text = 'GAME OVER!')
+game_over_message.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+try_again = Button(game_over_window, text = 'Try again?', font = 40, relief = RAISED, command = try_again_button_cmd)
+try_again.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
+game_over_window.withdraw()
 
+def game_over():
+    root.withdraw()
+    game_over_window.deiconify()
 
+welcome_screen = Toplevel(bg = 'white')
+welcome_screen.title('Modified Hangman')
+welcome_screen.resizable(width = FALSE, height = FALSE)
+welcome_screen.geometry('{}x{}'.format(740, 620))
 
+def instructions_button_cmd():
+    root.withdraw()
+    welcome_screen.deiconify()
 
+instructions_button = Button(bottom_frame, text = 'How to play', font = 40, relief = RAISED, command = instructions_button_cmd)
+instructions_button.pack(side = RIGHT, anchor = E, padx = 2, pady = 1, expand = YES, fill = BOTH)
 
+def begin_button_cmd():
+    welcome_screen.withdraw()
+    root.deiconify()
 
-
-
+def welcome():
+    welcome_screen_text = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Welcome_Screen.GIF')
+    background = Label(welcome_screen, image = welcome_screen_text)
+    background.welcome_screen_text = welcome_screen_text
+    background.pack()
+    begin_button = Button(welcome_screen, text = 'Let''s play!', font = 40, relief = RAISED, command = begin_button_cmd)
+    begin_button.pack(expand = YES, fill = X, anchor = N)
+    root.withdraw()
+    
+welcome()
+root_bg.pack()
 mainloop()
-
-
-
