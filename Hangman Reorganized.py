@@ -1,4 +1,4 @@
-import sqlite3 as sql, random, string, time
+import sqlite3 as sql, random, string
 from Tkinter import *
 
 class ValidatingEntry(Entry):
@@ -89,11 +89,11 @@ hangman_image6 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23
 hangman_image7 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage7.GIF')
 hangman_image8 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage8.GIF')
 hangman_image9 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage9.GIF')
-####################################################################################################################
+
 def begin_button_cmd():
     welcome_screen.withdraw()
-    pick_easy.pack_forget()
-    pick_hard.pack_forget()
+    pick_easy.configure(state = DISABLED)
+    pick_hard.configure(state = DISABLED)
     root.deiconify()
 
 welcome_screen = Toplevel()
@@ -110,23 +110,25 @@ pick_easy = Radiobutton(welcome_screen, text = "Easy: 10 attempts", font = 20, v
 pick_hard = Radiobutton(welcome_screen, text = "Hard: 5 attempts", font = 20, variable = diff_var, value = 2,
                         command = lambda: begin_button.config(state = NORMAL), relief = RAISED)
 
-
 welcome_screen_bg_image = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Background2.GIF')
 welcome_screen_bg = welcome_screen_canvas.create_image(0, 0, image = welcome_screen_bg_image)
+welcome_screen_instructions_text = """Once you select a difficulty below and press begin, you will be prompted to enter a
+word, let's call it the search word. The dictionary will be searched for the words, let's call them
+game words, that have the search word in their definitions. Of these game words, one will be
+randomly selected. It is this word that you will be guessing.
+We like losers and winners equally here, so have no fear, and enjoy!"""
+
+welcome_screen_logo_image = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Logo - Copy.GIF')
+welcome_screen_logo = welcome_screen_canvas.create_image(500, 130, image = welcome_screen_logo_image)
+
+welcome_screen_instructions = welcome_screen_canvas.create_text(480, 390, font = ("Arial", 16, "bold"), text = welcome_screen_instructions_text)
 welcome_screen_canvas.pack()
-#####################################################################################################################
+
 def instructions_button_cmd():
     root.withdraw()
     welcome_screen.deiconify()
-
-
-
 instructions_button = Button(bottom_frame, text = 'How to play', font = 20, relief = RAISED, command = instructions_button_cmd)
 instructions_button.pack(side = RIGHT, anchor = E, padx = 2, pady = 1, expand = YES, fill = BOTH)
-
-
-
-
 
 def welcome():
     begin_button_window = welcome_screen_canvas.create_window(771, 478, window = begin_button)
@@ -364,14 +366,12 @@ def clear_setup():
 def try_again_button_cmd():
     game_over_window.withdraw()
     game_over_window.grab_release()
-    root.withdraw()
+    pick_easy.configure(state = NORMAL)
+    pick_hard.configure(state = NORMAL)
     welcome_screen.deiconify()
-    begin_button.pack_forget()
-    pick_easy.pack(side = LEFT)
-    pick_hard.pack(side = LEFT)
-    begin_button.pack(expand = YES, fill = X)
+    welcome()
     begin_button.config(state = DISABLED)
-    canvas.pack_forget()
+    hangman_canvas.pack_forget()
     clear_setup()
     
     
