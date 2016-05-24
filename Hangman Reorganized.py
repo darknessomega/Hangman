@@ -61,7 +61,7 @@ root_bg_image = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 233
 root_bg = Label(root, image = root_bg_image)
 root_bg.root_bg_image = root_bg_image
 root_bg.place(x=0, y=0, relwidth=1, relheight=1)    
-window_position(root, 750, 500)
+window_position(root, 1000, 500)
 
 top_frame = Frame(root)
 middle_frame = Frame(root)
@@ -72,14 +72,14 @@ entry_label_text = StringVar()
 entry_label_text.set('Please enter a search word:')
 entry_label = Label(bottom_frame, bg = 'white', font = 32, textvariable = entry_label_text)
 entry_label.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
-word_contained_entry = Entry(bottom_frame)
+word_contained_entry = Entry(bottom_frame, font = 32)
 word_contained_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
 
 word_frame = Frame(top_frame, bg = 'white')
 hangman_frame = Frame(top_frame, bg = 'white')
 letters_frame = Frame(middle_frame, bg = 'white')
 
-canvas = Canvas(hangman_frame, bg = 'white', width = 200, height = 250)
+hangman_canvas = Canvas(hangman_frame, bg = 'white', width = 200, height = 250)
 hangman_image1 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage1.GIF')
 hangman_image2 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage2.GIF')
 hangman_image3 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage3.GIF')
@@ -89,43 +89,49 @@ hangman_image6 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23
 hangman_image7 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage7.GIF')
 hangman_image8 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage8.GIF')
 hangman_image9 = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\stage9.GIF')
-
-welcome_screen = Toplevel(bg = 'white')
-welcome_screen.title('Modified Hangman')
-welcome_screen.geometry('{}x{}'.format(740, 620))
-window_position(welcome_screen, 740, 620)
-
-
-def instructions_button_cmd():
-    root.withdraw()
-    welcome_screen.deiconify()
-
+####################################################################################################################
 def begin_button_cmd():
     welcome_screen.withdraw()
     pick_easy.pack_forget()
     pick_hard.pack_forget()
     root.deiconify()
 
-instructions_button = Button(bottom_frame, text = 'How to play', font = 40, relief = RAISED, command = instructions_button_cmd)
-instructions_button.pack(side = RIGHT, anchor = E, padx = 2, pady = 1, expand = YES, fill = BOTH)
-begin_button = Button(welcome_screen, text = 'Let''s play!', font = 40, relief = RAISED, state=DISABLED, command = begin_button_cmd)
+welcome_screen = Toplevel()
+welcome_screen.title('Modified Hangman')
+window_position(welcome_screen, 1000, 500)
+
+welcome_screen_canvas = Canvas(welcome_screen, width = 1000, height = 500)
+begin_button = Button(welcome_screen, text = 'Let''s play!', font = 40, relief = RAISED, state = DISABLED, command = begin_button_cmd)
+begin_button.configure(width = 40)
 
 diff_var = IntVar()
 pick_easy = Radiobutton(welcome_screen, text = "Easy: 10 attempts", font = 20, variable = diff_var, value = 1,
-                        command = lambda: begin_button.config(state=NORMAL), relief = RAISED)
+                        command = lambda: begin_button.config(state = NORMAL), relief = RAISED)
 pick_hard = Radiobutton(welcome_screen, text = "Hard: 5 attempts", font = 20, variable = diff_var, value = 2,
-                        command = lambda: begin_button.config(state=NORMAL), relief = RAISED)
+                        command = lambda: begin_button.config(state = NORMAL), relief = RAISED)
+
+
+welcome_screen_bg_image = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Background2.GIF')
+welcome_screen_bg = welcome_screen_canvas.create_image(0, 0, image = welcome_screen_bg_image)
+welcome_screen_canvas.pack()
+#####################################################################################################################
+def instructions_button_cmd():
+    root.withdraw()
+    welcome_screen.deiconify()
+
+
+
+instructions_button = Button(bottom_frame, text = 'How to play', font = 20, relief = RAISED, command = instructions_button_cmd)
+instructions_button.pack(side = RIGHT, anchor = E, padx = 2, pady = 1, expand = YES, fill = BOTH)
+
+
+
 
 
 def welcome():
-    welcome_screen_text = PhotoImage(file = 'C:\Users\Yevgeniy\OneDrive\Documents\CSCI 23300\GitHub Repos\Hangman\Hangman images\Welcome_Screen.GIF')
-    background = Label(welcome_screen, image = welcome_screen_text)
-    background.welcome_screen_text = welcome_screen_text
-    background.pack()
-    pick_easy.pack(side = LEFT)
-    pick_hard.pack(side = LEFT)
-    begin_button.pack(expand = YES, fill = X)
-        
+    begin_button_window = welcome_screen_canvas.create_window(771, 478, window = begin_button)
+    pick_easy_button_window = welcome_screen_canvas.create_window(100, 480, window = pick_easy)
+    pick_hard_button_window = welcome_screen_canvas.create_window(290, 480, window = pick_hard)
     root.withdraw()
     
 welcome()
@@ -165,31 +171,31 @@ def get_game_info(game_info):
 correct_letter_indices = []
 incorrect_letter_spaces = []
 correct_letter_spaces = []
-correctLetters = StringVar()
-incorrectLetters = StringVar()
-incorrectLettersCount = [0]
+correct_letters = StringVar()
+incorrect_letters = StringVar()
+incorrect_letters_count = [0]
 
-word_frame_game_info = Label(word_frame, font = 40, textvariable = correctLetters , bg = 'white')
+word_frame_game_info = Label(word_frame, font = 40, textvariable = correct_letters , bg = 'white')
 
-def initial_correct_letter_space(correctLetters, correct_letter_spaces):
+def initial_correct_letter_space(correct_letters, correct_letter_spaces):
     for i in range(len(game_info[0])):
         correct_letter_spaces += '_'
     string_letter_spaces = string.join(correct_letter_spaces)
-    correctLetters.set(string_letter_spaces)
+    correct_letters.set(string_letter_spaces)
     return correct_letter_spaces
 
-letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrectLetters, bg = 'white')
+letters_frame_incorrect_tries = Label(letters_frame, font = 40, textvariable = incorrect_letters, bg = 'white')
 
 
-def initial_incorrect_letter_space(incorrectLetters):
-    incorrectLetters.set('Incorrect Tries: ' + str(incorrectLettersCount[0]) + '\n' + string.join(incorrect_letter_spaces))
+def initial_incorrect_letter_space(incorrect_letters):
+    incorrect_letters.set('Incorrect Tries: ' + str(incorrect_letters_count[0]) + '\n' + string.join(incorrect_letter_spaces))
    
 def make_word_contained_button():
     if (len(word_contained_entry.get()) > 0):
         word_contained_button_cmd()
     else:
         search_reminder()
-word_contained_button = Button(bottom_frame, text = 'Submit search word', command = make_word_contained_button)
+word_contained_button = Button(bottom_frame, text = 'Submit search word', font = 40, command = make_word_contained_button)
 word_contained_button.pack(side = LEFT, anchor = S, pady = 1)
 
 def word_contained_button_cmd():
@@ -200,8 +206,8 @@ def word_contained_button_cmd():
     letters_frame.pack(side = RIGHT, expand = YES)
     letters_frame_incorrect_tries.pack()
     get_game_info(game_info)
-    initial_correct_letter_space(correctLetters, correct_letter_spaces)
-    initial_incorrect_letter_space(incorrectLetters)
+    initial_correct_letter_space(correct_letters, correct_letter_spaces)
+    initial_incorrect_letter_space(incorrect_letters)
     word_contained_entry.delete(0, END)
     word_contained_entry.pack_forget()  
     letter_guess_entry.pack(side = LEFT, anchor = S, padx = 1, pady = 1)
@@ -267,47 +273,47 @@ def edit_letter_space(correct_letter_spaces, count, indices = None):
     if (indices != None):
         for i in indices:
             correct_letter_spaces[i] = game_info[0][i]
-            correctLetters.set(string.join(correct_letter_spaces))
+            correct_letters.set(string.join(correct_letter_spaces))
         return correct_letter_spaces
     if (indices == None):
         count += 1
         print count
-        incorrectLetters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(correct_letter_spaces))
+        incorrect_letters.set('Incorrect Tries: ' + str(count) + '\n' + string.join(correct_letter_spaces))
         return count
 
-def edit_hangman_space(IncorrectLettersCount):
+def edit_hangman_space(incorrect_letters_count):
     if (diff_var.get() == 1):
-        if (IncorrectLettersCount[0] == 1):
-            canvas.pack()
-            hangman_display = canvas.create_image(100, 125, image = hangman_image1)
-        if (IncorrectLettersCount[0] == 2):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image2)
-        if (IncorrectLettersCount[0] == 3):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image3)
-        if (IncorrectLettersCount[0] == 4):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image4)
-        if (IncorrectLettersCount[0] == 5):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image5)
-        if (IncorrectLettersCount[0] == 6):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image6)
-        if (IncorrectLettersCount[0] == 7):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image7)
-        if (IncorrectLettersCount[0] == 8):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image8)
-        if (IncorrectLettersCount[0] == 9):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image9)
+        if (incorrect_letters_count[0] == 1):
+            hangman_canvas.pack()
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image1)
+        if (incorrect_letters_count[0] == 2):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image2)
+        if (incorrect_letters_count[0] == 3):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image3)
+        if (incorrect_letters_count[0] == 4):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image4)
+        if (incorrect_letters_count[0] == 5):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image5)
+        if (incorrect_letters_count[0] == 6):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image6)
+        if (incorrect_letters_count[0] == 7):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image7)
+        if (incorrect_letters_count[0] == 8):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image8)
+        if (incorrect_letters_count[0] == 9):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image9)
     if (diff_var.get() == 2):
-        if (IncorrectLettersCount[0] == 1):
-            canvas.pack()
-            hangman_display = canvas.create_image(100, 125, image = hangman_image1)
-        if (IncorrectLettersCount[0] == 2):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image3)
-        if (IncorrectLettersCount[0] == 3):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image5)
-        if (IncorrectLettersCount[0] == 4):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image7)
-        if (IncorrectLettersCount[0] == 5):
-            hangman_display = canvas.create_image(100, 125, image = hangman_image9)
+        if (incorrect_letters_count[0] == 1):
+            hangman_canvas.pack()
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image1)
+        if (incorrect_letters_count[0] == 2):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image3)
+        if (incorrect_letters_count[0] == 3):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image5)
+        if (incorrect_letters_count[0] == 4):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image7)
+        if (incorrect_letters_count[0] == 5):
+            hangman_display = hangman_canvas.create_image(100, 125, image = hangman_image9)
             
 
 letter_guess_entry = MaxLengthEntry(bottom_frame, width = 2, maxlength = 1, font = 40)
@@ -315,33 +321,33 @@ def letter_guess_button_cmd():
     match_check(match)
     match_action(correct_letter_indices, incorrect_letter_spaces, match)
     if (match[0] == 'True'):
-        edit_letter_space(correct_letter_spaces, incorrectLettersCount[0], correct_letter_indices)
+        edit_letter_space(correct_letter_spaces, incorrect_letters_count[0], correct_letter_indices)
     if (match[0] == 'False'):
-        incorrectLettersCount[0] = edit_letter_space(incorrect_letter_spaces, incorrectLettersCount[0])
+        incorrect_letters_count[0] = edit_letter_space(incorrect_letter_spaces, incorrect_letters_count[0])
     letter_guess_entry.delete(0, END)
-    edit_hangman_space(incorrectLettersCount)
+    edit_hangman_space(incorrect_letters_count)
     if (diff_var.get() == 1):
-        if (incorrectLettersCount[0] == 5):
+        if (incorrect_letters_count[0] == 5):
             clue_button.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-        if (incorrectLettersCount[0] == 10):
+        if (incorrect_letters_count[0] == 10):
             game_over()
     if (diff_var.get() == 2):
-        if (incorrectLettersCount[0] == 3):
+        if (incorrect_letters_count[0] == 3):
             clue_button.pack(expand = YES, fill = BOTH, padx = 6, pady = 6)
-        if (incorrectLettersCount[0] == 5):
+        if (incorrect_letters_count[0] == 5):
             game_over()
     
 
             
-letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', command = letter_guess_button_cmd)
+letter_guess_button = Button(bottom_frame, text = 'Submit letter guess', font = 40, command = letter_guess_button_cmd)
 
 def clear_setup():
     correct_letter_spaces[:] = []
     incorrect_letter_spaces[:] = []
     clue_label.pack_forget()
     clue_button.pack_forget()
-    incorrectLettersCount[0] = 0
-    incorrectLetters.set(initial_incorrect_letter_space(incorrectLetters))
+    incorrect_letters_count[0] = 0
+    incorrect_letters.set(initial_incorrect_letter_space(incorrect_letters))
     entry_label_text.set('Please enter a search word:')
     letter_guess_entry.pack_forget()
     letter_guess_button.pack_forget()
